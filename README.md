@@ -36,6 +36,7 @@ Development session logs are preserved in [`docs/worklog/`](docs/worklog/):
 | [2026-02-03-001.txt](docs/worklog/2026-02-03-001.txt) | Research & planning - uv analysis, Poetry comparison, migration design |
 | [2026-02-03-002.txt](docs/worklog/2026-02-03-002.txt) | Implementation - executing migration plan, file changes, testing |
 | [2026-02-03-003.txt](docs/worklog/2026-02-03-003.txt) | Finalization - log sanitization, documentation updates |
+| [2026-02-03-004.txt](docs/worklog/2026-02-03-004.txt) | Documentation - bilingual reports, README updates, git commits |
 
 ## 1. Installation Instructions
 ### 1.1 Installation of withings-sync with pip
