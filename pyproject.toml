@@ -1,38 +1,50 @@
-[tool.poetry]
+[project]
 name = "withings-sync"
 version = "1.0.0.dev1"
 description = "A tool for synchronisation of Withings (ex. Nokia Health Body) to Garmin Connect and Trainer Road."
 license = "MIT"
-authors = ["Masayuki Hamasaki <masayuki.hamasaki@gmail.com>",
-	   "Steffen Vogel <post@steffenvogel.de>",
-	   "Jarek Hartman <jhartman@interia.pl>",
-          ]
-maintainers = ["longstone <2110765+longstone@users.noreply.github.com>",
-              ]
-repository = "https://github.com/jaroslawhartman/withings-sync"
-homepage = "https://github.com/jaroslawhartman/withings-sync"
 readme = "README.md"
+requires-python = ">=3.12"
 keywords = ["garmin", "withings", "sync", "api", "scale", "smarthome"]
-packages = [{include = "withings_sync"}]
-classifiers = ["Topic :: Utilities",
-               "Topic :: Home Automation",
-              ]
+classifiers = [
+    "Topic :: Utilities",
+    "Topic :: Home Automation",
+]
+authors = [
+    { name = "Masayuki Hamasaki", email = "masayuki.hamasaki@gmail.com" },
+    { name = "Steffen Vogel", email = "post@steffenvogel.de" },
+    { name = "Jarek Hartman", email = "jhartman@interia.pl" },
+]
+maintainers = [
+    { name = "longstone", email = "2110765+longstone@users.noreply.github.com" },
+]
+dependencies = [
+    "garth>=0.5.0",
+    "requests>=2.32.3",
+    "lxml>=5.3.0",
+    "python-dotenv>=1.0.1",
+    "importlib-resources>=6.4.5",
+]
 
-[tool.poetry.dependencies]
-python = "^3.12"
-garth = ">=0.5.0"
-requests = ">=2.32.3"
-lxml = ">=5.3.0"
-python-dotenv = ">=1.0.1"
-importlib-resources = ">=6.4.5"
+[project.urls]
+Homepage = "https://github.com/jaroslawhartman/withings-sync"
+Repository = "https://github.com/jaroslawhartman/withings-sync"
 
-[tool.poetry.group.dev.dependencies]
-black = ">=24.10.0"
-pylint = ">=3.3.1"
-
-[tool.poetry.scripts]
+[project.scripts]
 withings-sync = "withings_sync.sync:main"
 
+[dependency-groups]
+dev = [
+    "black>=24.10.0",
+    "pylint>=3.3.1",
+]
+
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["withings_sync"]
+
+[tool.hatch.build.targets.sdist]
+include = ["withings_sync/**", "README.md"]
