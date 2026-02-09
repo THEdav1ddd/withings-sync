@@ -18,6 +18,17 @@ jobs:
       with:
         python-version: '3.12'
     
+    - name: Create config file
+      run: |
+        mkdir -p ~/.withings
+        cat > ~/.withings_user.json << EOF
+        {
+          "client_id": "${{ secrets.WITHINGS_CLIENT_ID }}",
+          "client_secret": "${{ secrets.WITHINGS_CLIENT_SECRET }}",
+          "code": "${{ secrets.WITHINGS_CODE }}"
+        }
+        EOF
+    
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -27,8 +38,5 @@ jobs:
       env:
         GARMIN_USERNAME: ${{ secrets.GARMIN_USERNAME }}
         GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
-        WITHINGS_CLIENT_ID: ${{ secrets.WITHINGS_CLIENT_ID }}
-        WITHINGS_CLIENT_SECRET: ${{ secrets.WITHINGS_CLIENT_SECRET }}
-        WITHINGS_CODE: ${{ secrets.WITHINGS_CODE }}
       run: |
-        withings-sync -v
+        withings-sync --garmin-username "$GARMIN_USERNAME" --garmin-password "$GARMIN_PASSWORD" -v
