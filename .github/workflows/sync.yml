@@ -1,0 +1,40 @@
+name: Withings Sync
+
+on:
+  schedule:
+    - cron: '0 8 * * *'  # Codziennie o 8:00 UTC (9:00 czasu polskiego)
+  workflow_dispatch:  # Możliwość ręcznego uruchomienia
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install withings-sync
+    
+    - name: Sync Withings to Garmin
+      env:
+        GARMIN_USERNAME: ${{ secrets.GARMIN_USERNAME }}
+        GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
+        WITHINGS_CLIENT_ID: ${{ secrets.WITHINGS_CLIENT_ID }}
+        WITHINGS_CLIENT_SECRET: ${{ secrets.WITHINGS_CLIENT_SECRET }}
+        WITHINGS_CODE: ${{ secrets.WITHINGS_CODE }}
+      run: |
+        withings-sync \
+          --garmin-username "$GARMIN_USERNAME" \
+          --garmin-password "$GARMIN_PASSWORD" \
+          --withings-client-id "$WITHINGS_CLIENT_ID" \
+          --withings-client-secret "$WITHINGS_CLIENT_SECRET" \
+          --withings-code "$WITHINGS_CODE" \
+          --verbose
