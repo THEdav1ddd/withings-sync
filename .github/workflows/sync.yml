@@ -2,7 +2,10 @@ name: Withings Sync
 
 on:
   schedule:
-    - cron: '0 8 * * *'
+# Uruchomienie o 6:25
+    - cron: '25 6 * * *'
+    # Uruchomienie o 8:00 oraz 11:00 (minuta "0" jest wspólna)
+    - cron: '0 8,11 * * *'
   workflow_dispatch:
 
 jobs:
