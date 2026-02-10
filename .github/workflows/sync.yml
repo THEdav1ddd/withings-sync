@@ -33,4 +33,7 @@ jobs:
         WITHINGS_ACCESS_TOKEN: ${{ secrets.WITHINGS_ACCESS_TOKEN }}
         WITHINGS_REFRESH_TOKEN: ${{ secrets.WITHINGS_REFRESH_TOKEN }}
         WITHINGS_USERID: ${{ secrets.WITHINGS_USERID }}
-      run: withings-sync --verbose
+        WITHINGS_APP_JSON: ${{ secrets.WITHINGS_APP_JSON }}
+      run: |
+        echo "$WITHINGS_APP_JSON" > /tmp/withings_app.json
+        WITHINGS_APP=/tmp/withings_app.json withings-sync --verbose
