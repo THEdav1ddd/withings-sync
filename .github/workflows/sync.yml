@@ -2,7 +2,7 @@ name: Withings Sync
 
 on:
   schedule:
-# Uruchomienie o 6:25
+  # Uruchomienie o 6:25
     - cron: '25 6 * * *'
     # Uruchomienie o 8:00 oraz 11:00 (minuta "0" jest wspólna)
     - cron: '0 8,11 * * *'
@@ -11,27 +11,26 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-    
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.12'
-    
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install git+https://github.com/jaroslawhartman/withings-sync.git
-    
+        pip install git+https://github.com/bartk89/withings-sync.git
+
     - name: Sync Withings to Garmin
-      run: |
-        withings-sync \
-          -g ${{ secrets.GARMIN_USERNAME }} ${{ secrets.GARMIN_PASSWORD }} \
-          --fromdate 2025-01-01
       env:
-        WITHINGS_CLIENT_ID: ${{ secrets.WITHINGS_CLIENT_ID }}
-        WITHINGS_CONSUMER_SECRET: ${{ secrets.WITHINGS_CLIENT_SECRET }}
-        WITHINGS_AUTHORIZATION_CODE: ${{ secrets.WITHINGS_CODE }}
+        GARMIN_USERNAME: ${{ secrets.GARMIN_USERNAME }}
+        GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
+        WITHINGS_ACCESS_TOKEN: ${{ secrets.WITHINGS_ACCESS_TOKEN }}
+        WITHINGS_REFRESH_TOKEN: ${{ secrets.WITHINGS_REFRESH_TOKEN }}
+        WITHINGS_USERID: ${{ secrets.WITHINGS_USERID }}
+      run: withings-sync --verbose
