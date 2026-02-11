@@ -2,7 +2,6 @@ name: Withings Sync
 
 on:
   schedule:
-  # Uruchomienie o 6:25
     - cron: '25 5 * * *'
     # Uruchomienie o 8:00 oraz 11:00 (minuta "0" jest wspólna)
     - cron: '0 6,7,10 * * *'
@@ -27,6 +26,7 @@ jobs:
         pip install git+https://github.com/bartk89/withings-sync.git
 
     - name: Sync Withings to Garmin
+      id: sync
       env:
         GARMIN_USERNAME: ${{ secrets.GARMIN_USERNAME }}
         GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
@@ -37,3 +37,51 @@ jobs:
       run: |
         echo "$WITHINGS_APP_JSON" > /tmp/withings_app.json
         WITHINGS_APP=/tmp/withings_app.json withings-sync --verbose
+        
+        # Pobierz odświeżone tokeny
+        if [ -f ~/.withings_user.json ]; then
+          echo "NEW_ACCESS_TOKEN=$(jq -r '.access_token' ~/.withings_user.json)" >> $GITHUB_OUTPUT
+          echo "NEW_REFRESH_TOKEN=$(jq -r '.refresh_token' ~/.withings_user.json)" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Update GitHub Secrets with new tokens
+      if: steps.sync.outputs.NEW_ACCESS_TOKEN != ''
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ secrets.REPO_PAT }}
+        script: |
+          await github.rest.actions.createOrUpdateRepoSecret({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            secret_name: 'WITHINGS_ACCESS_TOKEN',
+            encrypted_value: await (async () => {
+              const sodium = require('tweetsodium');
+              const key = await github.rest.actions.getRepoPublicKey({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+              });
+              const messageBytes = Buffer.from('${{ steps.sync.outputs.NEW_ACCESS_TOKEN }}');
+              const keyBytes = Buffer.from(key.data.key, 'base64');
+              const encryptedBytes = sodium.seal(messageBytes, keyBytes);
+              return Buffer.from(encryptedBytes).toString('base64');
+            })()
+          });
+          
+          await github.rest.actions.createOrUpdateRepoSecret({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            secret_name: 'WITHINGS_REFRESH_TOKEN',
+            encrypted_value: await (async () => {
+              const sodium = require('tweetsodium');
+              const key = await github.rest.actions.getRepoPublicKey({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+              });
+              const messageBytes = Buffer.from('${{ steps.sync.outputs.NEW_REFRESH_TOKEN }}');
+              const keyBytes = Buffer.from(key.data.key, 'base64');
+              const encryptedBytes = sodium.seal(messageBytes, keyBytes);
+              return Buffer.from(encryptedBytes).toString('base64');
+            })()
+          });
+          
+          console.log('✅ Tokens updated successfully');
